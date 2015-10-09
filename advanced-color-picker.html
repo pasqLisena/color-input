@@ -110,8 +110,8 @@
           </div>
         </div>
         <div>
-          <paper-button dialog-confirm raised>OK</paper-button>
-          <paper-button dialog-dismiss raised>CANCEL</paper-button>
+          <paper-button dialog-confirm raised id="dialogConfirm">OK</paper-button>
+          <paper-button dialog-dismiss raised id="dialogDismiss">CANCEL</paper-button>
         </div>
       </div><!-- END .controls -->
 
@@ -172,7 +172,9 @@
         'onColorChanged(colorObj.hex)'
       ],
       listeners: {
-        'colorPicker.colorselected': 'onPickerSelected'
+        'colorPicker.colorselected': 'onPickerSelected',
+        'dialogDismiss.tap': '_onDialogClick',
+        'dialogConfirm.tap': '_onDialogClick'
       },
       setColor: function(color){
         this.colorObj = {
