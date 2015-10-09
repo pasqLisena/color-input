@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../color-input/advanced-color-picker.html">
+<!--
+HTML5 color-type input polyfill in Polymer.
+It extends the input element.
+
+Example:
+
+<input type="color" is="color-input"></input>
+
+@demo
+-->
+
+<dom-module id="color-input">
+  <style>
+    :host {
+      --choosen-color: #000000;
+
+      -webkit-appearance: none;
+      display: inline-block;
+      width: 48px;
+      height: 25px;
+      overflow: hidden;
+
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+
+      padding: 1px 0px;
+      background-color: var(--choosen-color, buttonface);
+      outline: 1px solid #a9a9a9;
+      border: 5px solid #fff;
+      color: transparent;
+
+      cursor: pointer
+
+    }
+    :host(:focus) {
+      outline-offset: 0;
+    }
+    :host(::selection) {
+      background: var(--choosen-color, buttonface);
+    }
+    :host(::-moz-selection) {
+      background: var(--choosen-color, buttonface);
+    }
+
+  </style>
+  <template>
+  </template>
+
+  <script>
+    (function(){
+      function isColorInputSupported (){
+        if(window.Modernizr && window.Modernizr.inputtypes){
+          return window.Modernizr.inputtypes.color
+        }else{
+          var i = document.createElement("input");
+          i.setAttribute("type", "color");
+          return i.type !== "text";
+        }
+      }
+      console.log(window.Polymer)
+      window.Polymer.forceColorPicker = true;
+      if(window.Polymer.forceColorPicker || !isColorInputSupported()){
+        Polymer({
+          is: 'color-input',
+          extends: 'input',
+          listeners: {
+            'click': 'showColorPicker'
+          },
+          showColorPicker : function(){
+            var input = this;
+
+            if(!input.colorPicker) {
+              input.colorPicker = document.createElement('advanced-color-picker');
+              input.colorPicker.setColor(input.value);
+              document.body.appendChild(input.colorPicker);
+              input.colorPicker.addEventListener('iron-overlay-closed', function(e) {
+                if(e.detail.confirmed) {
+                  input.onColorSelected(input.colorPicker.color, input);
+                }
+                document.body.removeChild(input.colorPicker);
+                input.colorPicker = null;
+              });
+              input.colorPicker.toggle();
+            }
+
+          },
+          onColorSelected: function(color, input){
+            input.setAttribute('value', color);
+            input.customStyle['--choosen-color'] = color;
+            input.updateStyles();
+          },
+          ready: function() {
+            var value = this.getAttribute('value') || '#000000';
+            this.onColorSelected(value, this);
+          }
+        });
+      }
+    })();
+  </script>
+</dom-module>
