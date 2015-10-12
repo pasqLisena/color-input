@@ -17,7 +17,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script>
       window.Polymer = window.Polymer || {};
       window.Polymer.dom = 'shadow';
-
+      //  window.forceColorPicker = true;
   </script>
   <link rel="import" href="../color-input.html">
   <style>
@@ -34,14 +34,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <label>
         without value:
         <br>
-        <input  is="color-input"></input>
+        <input type="color" is="color-input"></input>
       </label>
     </li>
     <li>
       <label>
         with value setted to #14fc00:
         <br>
-        <input  is="color-input" value="#14fc00"></input>
+        <input type="color" is="color-input" value="#14fc00"></input>
+      </label>
+    </li>
+    <li>
+      <label>
+        with the attribute <code>force-color-picker</code>:
+        <br>
+        <input type="color" is="color-input" force-color-picker></input>
       </label>
     </li>
   </ul>

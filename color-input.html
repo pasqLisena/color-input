@@ -15,7 +15,6 @@ Example:
   <style>
     :host {
       --choosen-color: #000000;
-
       -webkit-appearance: none;
       display: inline-block;
       width: 48px;
@@ -31,9 +30,7 @@ Example:
       outline: 1px solid #a9a9a9;
       border: 5px solid #fff;
       color: transparent;
-
-      cursor: pointer
-
+      cursor: pointer;
     }
     :host(:focus) {
       outline-offset: 0;
@@ -46,9 +43,7 @@ Example:
     }
 
   </style>
-  <template>
-  </template>
-
+  <template></template>
   <script>
     (function(){
       function isColorInputSupported (){
@@ -60,44 +55,70 @@ Example:
           return i.type !== "text";
         }
       }
-      console.log(window.Polymer)
-      window.Polymer.forceColorPicker = true;
-      if(window.Polymer.forceColorPicker || !isColorInputSupported()){
-        Polymer({
-          is: 'color-input',
-          extends: 'input',
-          listeners: {
-            'click': 'showColorPicker'
-          },
-          showColorPicker : function(){
-            var input = this;
 
-            if(!input.colorPicker) {
-              input.colorPicker = document.createElement('advanced-color-picker');
-              input.colorPicker.setColor(input.value);
-              document.body.appendChild(input.colorPicker);
-              input.colorPicker.addEventListener('iron-overlay-closed', function(e) {
-                if(e.detail.confirmed) {
-                  input.onColorSelected(input.colorPicker.color, input);
-                }
-                document.body.removeChild(input.colorPicker);
-                input.colorPicker = null;
-              });
-              input.colorPicker.toggle();
+      var colorInputMixin;
+      Polymer({
+        is: 'color-input',
+        extends: 'input',
+        properties: {
+          forceColorPicker: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+            value: function(){
+              return window.forceColorPicker;
             }
-
           },
-          onColorSelected: function(color, input){
-            input.setAttribute('value', color);
-            input.customStyle['--choosen-color'] = color;
-            input.updateStyles();
-          },
-          ready: function() {
-            var value = this.getAttribute('value') || '#000000';
-            this.onColorSelected(value, this);
+          drawPicker: {
+            type: Boolean,
+            notify: true,
+            computed: 'pickerMustBeDrawn(forceColorPicker)',
+            readonly: true
           }
-        });
-      }
+        },
+        listeners: {
+          'click': 'showColorPicker'
+        },
+        pickerMustBeDrawn(){
+          return this.forceColorPicker || !isColorInputSupported();
+        },
+        showColorPicker : function(){
+          console.log(this.drawPicker)
+          if(!this.drawPicker) return;
+          var input = this;
+
+          if(!input.colorPicker) {
+            input.colorPicker = document.createElement('advanced-color-picker');
+            input.colorPicker.setColor(input.value);
+            document.body.appendChild(input.colorPicker);
+            input.colorPicker.addEventListener('iron-overlay-closed', function(e) {
+              if(e.detail.confirmed) {
+                input.onColorSelected(input.colorPicker.color, input);
+              }
+              document.body.removeChild(input.colorPicker);
+              input.colorPicker = null;
+            });
+            input.colorPicker.toggle();
+          }
+
+        },
+        onColorSelected: function(color, input){
+          input = input || this;
+          color = (typeof color == "string") ? color : this.value;
+          console.log(color)
+          input.setAttribute('value', color);
+          input.customStyle['--choosen-color'] = color;
+          input.updateStyles();
+        },
+        ready: function() {
+          if(this.forceColorPicker) {
+            this.setAttribute('type', 'text');
+          }
+          var value = this.getAttribute('value') || '#000000';
+          this.onColorSelected(value, this);
+          this.addEventListener('change', this.onColorSelected);
+        }
+      });
     })();
   </script>
 </dom-module>
