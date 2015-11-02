@@ -1,49 +1,79 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../color-input/advanced-color-picker.html">
 <!--
-HTML5 color-type input polyfill in Polymer.
-It extends the input element.
-
+A color picker element in Polymer.
+<br>
+It wants to replicate all the features of [HTML5 color-type input](http://www.w3schools.com/jsref/dom_obj_color.asp).
+<br>
 Example:
 
-<input type="color" is="color-input"></input>
+    <color-input></color-input>
 
 @demo
 -->
 
 <dom-module id="color-input">
   <style>
-    :host {
-      --choosen-color: #000000;
-      -webkit-appearance: none;
+    :host{
       display: inline-block;
       width: 48px;
       height: 25px;
-      overflow: hidden;
-
+    }
+    #realInput {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
+    }
+    #realInput[styled] {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+
+      -webkit-appearance: none;
+      overflow: hidden;
 
       padding: 1px 0px;
-      background-color: var(--choosen-color, buttonface);
       outline: 1px solid #a9a9a9;
-      border: 5px solid #fff;
       color: transparent;
       cursor: pointer;
+      background-color: var(--choosen-color, #000);
+
+      border-width: 5px;
+      border-style: solid;
+      -webkit-border-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f4f4f4), to(#cccccc)) 1 10%;
+      -webkit-border-image: -webkit-linear-gradient(#f4f4f4, #cccccc) 1 10%;
+      -moz-border-image: -moz-linear-gradient(#f4f4f4, #cccccc) 1 10%;
+      -o-border-image: -o-linear-gradient(#f4f4f4, #cccccc) 1 10%;
+      border-image: linear-gradient(to bottom, #f4f4f4, #cccccc) 1 10%;
     }
-    :host(:focus) {
+    #realInput[styled]:active {
       outline-offset: 0;
-    }
-    :host(::selection) {
-      background: var(--choosen-color, buttonface);
-    }
-    :host(::-moz-selection) {
-      background: var(--choosen-color, buttonface);
+      -webkit-border-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cccccc), to(#f4f4f4)) 1 10%;
+      -webkit-border-image: -webkit-linear-gradient(#cccccc, #f4f4f4) 1 10%;
+      -moz-border-image: -moz-linear-gradient(#cccccc, #f4f4f4) 1 10%;
+      -o-border-image: -o-linear-gradient(#cccccc, #f4f4f4) 1 10%;
+      border-image: linear-gradient(to bottom, #cccccc, #f4f4f4) 1 10%;
     }
 
+    #realInput[styled]:focus {
+      outline-offset: 0;
+    }
+    #realInput[styled]::selection {
+      background: var(--choosen-color, buttonface);
+    }
+    #realInput[styled]::-moz-selection {
+      background: var(--choosen-color, buttonface);
+    }
   </style>
-  <template></template>
+  <template>
+    <input id="realInput" styled$="{{_styled}}" type="text" value="{{value::change}}" spellcheck="false" autocorrect="off"></input>
+  </template>
+
   <script>
     (function(){
       function isColorInputSupported (){
@@ -56,35 +86,50 @@ Example:
         }
       }
 
-      var colorInputMixin;
       Polymer({
         is: 'color-input',
-        extends: 'input',
+        behaviors: [Polymer.IronFormElementBehavior],
         properties: {
-          forceColorPicker: {
+          /**
+          * Use native <code>&lt;input type="color"&gt;</code>, if the browser supports it.<br>
+          * You can set it globally, setting <code>window.useNativeColorPicker</code> to <code>true</code>
+          */
+          native: {
             type: Boolean,
             notify: true,
             reflectToAttribute: true,
             value: function(){
-              return window.forceColorPicker;
-            }
+              return !!window.useNativeColorPicker;
+            },
+            observer: '_onNativeSet'
           },
-          drawPicker: {
+          _styled: {
             type: Boolean,
+            computed: "_pickerMustBeDrawn(native)"
+          },
+          /**
+          * The choosen color as hexadecimal string
+          */
+          value: {
+            type: String,
             notify: true,
-            computed: 'pickerMustBeDrawn(forceColorPicker)',
-            readonly: true
+            reflectToAttribute: true,
+            observer: '_onColorSelected'
           }
         },
         listeners: {
-          'click': 'showColorPicker'
+          'click': '_showColorPicker'
         },
-        pickerMustBeDrawn(){
-          return this.forceColorPicker || !isColorInputSupported();
+        _pickerMustBeDrawn() {
+          return !isColorInputSupported() || !this.native;
         },
-        showColorPicker : function(){
-          console.log(this.drawPicker)
-          if(!this.drawPicker) return;
+        _onNativeSet: function(){
+          var inputType = this.native ? 'color' : 'text';
+          this.$.realInput.setAttribute('type', inputType);
+        },
+        _showColorPicker : function(e){
+          if(!this._pickerMustBeDrawn()) return;
+          e.preventDefault();
           var input = this;
 
           if(!input.colorPicker) {
@@ -93,30 +138,33 @@ Example:
             document.body.appendChild(input.colorPicker);
             input.colorPicker.addEventListener('iron-overlay-closed', function(e) {
               if(e.detail.confirmed) {
-                input.onColorSelected(input.colorPicker.color, input);
+                input._onColorSelected.call(input, input.colorPicker.color);
               }
               document.body.removeChild(input.colorPicker);
               input.colorPicker = null;
             });
             input.colorPicker.toggle();
           }
-
         },
-        onColorSelected: function(color, input){
-          input = input || this;
+        _onColorSelected: function(color){
           color = (typeof color == "string") ? color : this.value;
-          console.log(color)
-          input.setAttribute('value', color);
-          input.customStyle['--choosen-color'] = color;
-          input.updateStyles();
+          if(this._pickerMustBeDrawn() && !color.match(/#[0-9a-f]{6}/i) ){
+            console.warn('The specified value "'+ color +'" does not conform to the required format.  The format is "#rrggbb" where rr, gg, bb are two-digit hexadecimal numbers.')
+            this._onColorSelected('#000000');
+            return;
+          }
+          if(this.value != color) this.value = color;
+
+          if(this._pickerMustBeDrawn()) {
+            //style it!
+            this.customStyle['--choosen-color'] = color;
+            this.updateStyles();
+          }
         },
         ready: function() {
-          if(this.forceColorPicker) {
-            this.setAttribute('type', 'text');
-          }
-          var value = this.getAttribute('value') || '#000000';
-          this.onColorSelected(value, this);
-          this.addEventListener('change', this.onColorSelected);
+          var value = this.value || this.getAttribute('value') || '#000000';
+          this.defaultValue = value;
+          this._onColorSelected(value, this);
         }
       });
     })();

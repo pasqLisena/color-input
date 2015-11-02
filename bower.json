@@ -1,6 +1,5 @@
 {
   "name": "color-input",
-  "version": "0.1.0",
   "authors": [
     "Pasquale Lisena (pasq.lisena@gmail.com)"
   ],
@@ -29,6 +28,7 @@
   ],
   "dependencies": {
     "color-picker-element": "~0.0.3",
+    "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#~1.0.5",
     "iron-input": "PolymerElements/iron-input#~1.0.6",
     "paper-color-picker": "https://github.com/fabiospada/paper-color-picker.git",
     "paper-dialog-behavior": "PolymerElements/paper-dialog-behavior#~1.0.6",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-form": "PolymerElements/iron-form#~1.0.10",
     "web-component-tester": "*"
   }
 }

@@ -15,13 +15,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <title>color-input Demo</title>
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script>
-      window.Polymer = window.Polymer || {};
-      window.Polymer.dom = 'shadow';
-      //  window.forceColorPicker = true;
+  window.Polymer = window.Polymer || {};
+  // window.Polymer.dom = 'shadow';
   </script>
   <link rel="import" href="../color-input.html">
+  <link rel="import" href="../../iron-form/iron-form.html">
+
   <style>
-  input {
+  color-input {
     margin: 1em 0 2em;
   }
   </style>
@@ -29,28 +30,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <body>
 
   <p>An example of <code>&lt;color-input&gt;</code>:</p>
-  <ul>
-    <li>
-      <label>
-        without value:
-        <br>
-        <input type="color" is="color-input"></input>
-      </label>
-    </li>
-    <li>
-      <label>
-        with value setted to #14fc00:
-        <br>
-        <input type="color" is="color-input" value="#14fc00"></input>
-      </label>
-    </li>
-    <li>
-      <label>
-        with the attribute <code>force-color-picker</code>:
-        <br>
-        <input type="color" is="color-input" force-color-picker></input>
-      </label>
-    </li>
-  </ul>
+  <form is="iron-form" action="">
+
+    <ul>
+      <li>
+        <label>
+          without value:
+          <br>
+          <color-input name="color1"></color-input>
+        </label>
+      </li>
+      <li>
+        <label>
+          with value setted to #14fc00:
+          <br>
+          <color-input value="#14fc00" name="color2"></color-input>
+        </label>
+      </li>
+      <li>
+        <label>
+          with the attribute <code>native</code>:
+          <br>
+          <color-input native name="color3"></color-input>
+        </label>
+      </li>
+    </ul>
+    <input type="reset">
+    <input type="submit">
+    <output id="submit-output">
+
+    </output>
+  </form>
+  <script>
+  Array.prototype.forEach.call(document.querySelectorAll('color-picker'), function(node){
+    node.addEventListener('change', function(e){
+      console.log(e)
+    });
+  })
+  document.querySelector('form').addEventListener('iron-form-submit', function(e){
+    document.querySelector('#submit-output').value = JSON.stringify(e.detail);
+  })
+
+  </script>
 </body>
 </html>
