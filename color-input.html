@@ -120,7 +120,7 @@ Example:
         listeners: {
           'click': '_showColorPicker'
         },
-        _pickerMustBeDrawn() {
+        _pickerMustBeDrawn: function() {
           return !isColorInputSupported() || !this.native;
         },
         _onNativeSet: function(){
@@ -153,8 +153,10 @@ Example:
             this._onColorSelected('#000000');
             return;
           }
-          if(this.value != color) this.value = color;
-
+          if(this.value != color) {
+            this.value = color;
+            this.fire('change');
+          }
           if(this._pickerMustBeDrawn()) {
             //style it!
             this.customStyle['--choosen-color'] = color;

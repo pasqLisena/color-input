@@ -62,9 +62,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </output>
   </form>
   <script>
-  Array.prototype.forEach.call(document.querySelectorAll('color-picker'), function(node){
+  Array.prototype.forEach.call(document.querySelectorAll('color-input'), function(node){
     node.addEventListener('change', function(e){
-      console.log(e)
+      console.log(e);
     });
   })
   document.querySelector('form').addEventListener('iron-form-submit', function(e){
