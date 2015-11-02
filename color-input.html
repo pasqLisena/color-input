@@ -118,10 +118,15 @@ Example:
           }
         },
         listeners: {
-          'click': '_showColorPicker'
+          'click': '_showColorPicker',
+          'realInput.change': '_propagateChange'
         },
         _pickerMustBeDrawn: function() {
           return !isColorInputSupported() || !this.native;
+        },
+        _propagateChange: function() {
+          //needed for shadow dom!
+          this.fire('change');
         },
         _onNativeSet: function(){
           var inputType = this.native ? 'color' : 'text';
