@@ -1,0 +1,7 @@
+{
+  "directory": "components",
+  "proxy": "http://proxy.consoteam.it:8080",
+  "https-proxy": "http://proxy.consoteam.it:8080",
+  "ssl-strict": false
+}
+

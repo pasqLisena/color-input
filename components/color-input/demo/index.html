@@ -1,0 +1,76 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>color-input Demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script>
+  window.Polymer = window.Polymer || {};
+  // window.Polymer.dom = 'shadow';
+  </script>
+  <link rel="import" href="../color-input.html">
+  <link rel="import" href="../../iron-form/iron-form.html">
+
+  <style>
+  color-input {
+    margin: 1em 0 2em;
+  }
+  </style>
+</head>
+<body>
+
+  <p>An example of <code>&lt;color-input&gt;</code>:</p>
+  <form is="iron-form" action="">
+
+    <ul>
+      <li>
+        <label>
+          without value:
+          <br>
+          <color-input name="color1"></color-input>
+        </label>
+      </li>
+      <li>
+        <label>
+          with value setted to #14fc00:
+          <br>
+          <color-input value="#14fc00" name="color2"></color-input>
+        </label>
+      </li>
+      <li>
+        <label>
+          with the attribute <code>native</code>:
+          <br>
+          <color-input native name="color3"></color-input>
+        </label>
+      </li>
+    </ul>
+    <input type="reset">
+    <input type="submit">
+    <output id="submit-output">
+
+    </output>
+  </form>
+  <script>
+  Array.prototype.forEach.call(document.querySelectorAll('color-picker'), function(node){
+    node.addEventListener('change', function(e){
+      console.log(e)
+    });
+  })
+  document.querySelector('form').addEventListener('iron-form-submit', function(e){
+    document.querySelector('#submit-output').value = JSON.stringify(e.detail);
+  })
+
+  </script>
+</body>
+</html>

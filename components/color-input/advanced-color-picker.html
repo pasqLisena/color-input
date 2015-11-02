@@ -1,0 +1,217 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../color-picker-element/dist/color-picker.html">
+
+<dom-module id="advanced-color-picker">
+  <link rel="import" type="css" href="../paper-dialog-behavior/paper-dialog-common.css">
+  <style>
+  :host {
+    min-height: 340px;
+    min-width: 350px;
+    padding: 20px;
+    --paper-dialog-background-color: #f4f4f4;
+    --choosen-color: #000;
+    --paper-button: {
+      background: var(--default-primary-color, #ccc);
+      color: var(--text-primary-color, #222);
+      /*width: 100%;*/
+    }
+  }
+  .container {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+  .controls{
+    padding: 0 1em;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+       -ms-flex-pack: justify;
+           justify-content: space-between;
+  }
+  color-picker {
+    display: block;
+    height: 300px;
+    width: 300px;
+    border: 1px solid #ccc;
+  }
+  .field {
+    margin: 20px 5px;
+  }
+  .field label {
+    font-weight: bold;
+    margin-right: 1em;
+  }
+  #colorOutput {
+    background: var(--choosen-color);
+    height: 2em;
+    width: 4em;
+    margin: auto;
+    border: 1px solid #ccc;
+  }
+  #textoutput {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: .5em;
+    width: 4.5em;
+  }
+  output {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  paper-button[dialog-dismiss]{
+    background: #ccc;
+    color:#222;
+  }
+  input{
+    margin: 0;
+  }
+  </style>
+  <template>
+    <div class="container">
+
+      <color-picker id="colorPicker"></color-picker>
+
+      <div class="controls">
+        <div class="output-cont">
+          <output id="colorOutput" for="r g b"></output>
+          <output id="textoutput" for="r g b">{{colorObj.hex}}</output>
+        </div>
+        <div class="field-container">
+          <div class="field">
+            <label for="r">R:</label>
+            <input is="iron-input" type="number" name="r" min="0" max="255"
+            maxlength="3" id="r" bind-value="{{colorObj.rgb.r}}"/>
+          </div>
+          <div class="field">
+            <label for="g">G:</label>
+            <input is="iron-input" type="number" name="g" min="0" max="255"
+            maxlength="3" id="g" bind-value="{{colorObj.rgb.g}}"/>
+          </div>
+          <div class="field">
+            <label for="b">B:</label>
+            <input is="iron-input" type="number" name="b" min="0" max="255"
+            maxlength="3" id="b" bind-value="{{colorObj.rgb.b}}"/>
+          </div>
+        </div>
+        <div>
+          <paper-button dialog-confirm raised id="dialogConfirm">OK</paper-button>
+          <paper-button dialog-dismiss raised id="dialogDismiss">CANCEL</paper-button>
+        </div>
+      </div><!-- END .controls -->
+
+    </div>
+  </template>
+
+  <script>
+  (function(){
+    var DEFAULT_COLOR = '#000000';
+    function hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+
+    function rgbToHex(r, g, b) {
+      r = parseInt(r);
+      g = parseInt(g);
+      b = parseInt(b);
+
+      if(isNaN(r) || isNaN(g) || isNaN(b))
+      return DEFAULT_COLOR;
+
+      var decColor = b + 256 * g + 65536 * r;
+      hex = decColor.toString(16);
+      while(hex.length < 6){
+        hex = '0'+ hex;
+      }
+      return hex.length === 6? '#'+hex : DEFAULT_COLOR;
+    }
+
+    Polymer({
+      is: 'advanced-color-picker',
+      behaviors: [
+        Polymer.PaperDialogBehavior
+      ],
+      properties:{
+        color: {
+          type: String,
+          computed: 'computeHexColor(colorObj.hex)',
+          notify: true
+        },
+        colorObj: {
+          type: Object,
+          value: function(){
+            return {
+              hex: DEFAULT_COLOR,
+              rgb: hexToRgb(DEFAULT_COLOR)
+            }
+          }
+        }
+      },
+      observers: [
+        'updateColor(colorObj.rgb.*)',
+        'onColorChanged(colorObj.hex)'
+      ],
+      listeners: {
+        'colorPicker.colorselected': 'onPickerSelected',
+        'dialogDismiss.tap': '_onDialogClick',
+        'dialogConfirm.tap': '_onDialogClick'
+      },
+      setColor: function(color){
+        this.colorObj = {
+          hex: color || DEFAULT_COLOR,
+          rgb: hexToRgb(color)
+        }
+      },
+      updateColor: function(changed){
+        if (changed.path == 'colorObj.rgb') return;
+
+        //single rgb editing
+        var rgb = this.colorObj.rgb;
+        var changedValue = parseInt(changed.value);
+        if(!changedValue || changedValue < 0){
+          this.set(changed.path, 0);
+          return;
+        } else if(changedValue > 255) {
+          this.set(changed.path, 255);
+          return;
+        }
+
+        this.set('colorObj.hex', rgbToHex(rgb.r, rgb.g, rgb.b));
+      },
+      onPickerSelected: function(e){
+        this.colorObj = e.detail;
+      },
+      onColorChanged: function() {
+        this.customStyle['--choosen-color'] = this.colorObj.hex;
+        this.updateStyles();
+      },
+      computeHexColor: function (hex){
+        return hex;
+      },
+      ready: function(){
+        this.withBackdrop = true;
+      }
+    });
+  })();
+  </script>
+</dom-module>

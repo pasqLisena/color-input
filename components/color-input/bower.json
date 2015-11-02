@@ -1,0 +1,42 @@
+{
+  "name": "color-input",
+  "authors": [
+    "Pasquale Lisena (pasq.lisena@gmail.com)"
+  ],
+  "description": "HTML5 color-type input polyfill in Polymer",
+  "main": "color-input.html",
+  "keywords": [
+    "color",
+    "color-input",
+    "web-component",
+    "web-components",
+    "polymer",
+    "polyfill",
+    "html5",
+    "color-picker",
+    "colorpicker"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/pasqLisena/color-input/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "demo"
+  ],
+  "dependencies": {
+    "color-picker-element": "~0.0.3",
+    "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#~1.0.5",
+    "iron-input": "PolymerElements/iron-input#~1.0.6",
+    "paper-color-picker": "https://github.com/fabiospada/paper-color-picker.git",
+    "paper-dialog-behavior": "PolymerElements/paper-dialog-behavior#~1.0.6",
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-form": "PolymerElements/iron-form#~1.0.10",
+    "web-component-tester": "*"
+  }
+}
