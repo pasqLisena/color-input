@@ -125,7 +125,8 @@ Example:
           return !isColorInputSupported() || !this.native;
         },
         _propagateChange: function() {
-          //needed for shadow dom!
+          if(!this.defaultValue) return;
+          //needed for shadow dom
           this.fire('change');
         },
         _onNativeSet: function(){
@@ -151,14 +152,14 @@ Example:
             input.colorPicker.toggle();
           }
         },
-        _onColorSelected: function(color){
+        _onColorSelected: function(color, stopEvent){
           color = (typeof color == "string") ? color : this.value;
           if(this._pickerMustBeDrawn() && !color.match(/#[0-9a-f]{6}/i) ){
             console.warn('The specified value "'+ color +'" does not conform to the required format.  The format is "#rrggbb" where rr, gg, bb are two-digit hexadecimal numbers.')
             this._onColorSelected('#000000');
             return;
           }
-          if(this.value != color) {
+          if(!stopEvent && this.value != color) {
             this.value = color;
             this.fire('change');
           }
@@ -171,7 +172,7 @@ Example:
         ready: function() {
           var value = this.value || this.getAttribute('value') || '#000000';
           this.defaultValue = value;
-          this._onColorSelected(value, this);
+          this._onColorSelected(value, true);
         }
       });
     })();
